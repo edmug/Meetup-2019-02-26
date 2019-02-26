@@ -24,7 +24,6 @@ namespace aes
             {
                 key = keygen.GetBytes(32);
             }
-            
 
             using (var aesAlg = Aes.Create())
             {
@@ -41,19 +40,17 @@ namespace aes
                 aesAlg.Key = key;
                 aesAlg.IV = iv;
 
-                var encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
                 byte[] encrypted;
 
+                using (var encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV))
                 using (var msEncrypt = new MemoryStream())
+                using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
                 {
-                    using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    using (var swEncrypt = new StreamWriter(csEncrypt))
                     {
-                        using (var swEncrypt = new StreamWriter(csEncrypt))
-                        {
-                            swEncrypt.Write(plainText);
-                        }
-                        encrypted = msEncrypt.ToArray();
+                        swEncrypt.Write(plainText);
                     }
+                    encrypted = msEncrypt.ToArray();
                 }
             }
         }
